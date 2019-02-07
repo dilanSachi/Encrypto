@@ -114,8 +114,6 @@ public class MainActivity extends AppCompatActivity {
 
                                 byte[] encrypted = encryptFile(key, bytes);
 
-                                //byte[] decrypted = decryptFile(key, encrypted);
-
                                 if(isStoragePermissionGranted()){
 
                                     writeToSDFile(encrypted);
@@ -151,9 +149,6 @@ public class MainActivity extends AppCompatActivity {
 
                 final byte[] image = IOUtils.toByteArray(imageStream);
 
-                //final Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
-                //final byte[] bytes = getBytesFromBitmap(selectedImage);
-
                 new Thread(new Runnable() {
                     public void run() {
 
@@ -161,10 +156,7 @@ public class MainActivity extends AppCompatActivity {
                             byte[] byt =  Base64.decode(txt_key.getText().toString(),1);
                             Key originalKey = new SecretKeySpec(byt, 0, byt.length, "AES");
 
-                            System.out.println("awdawfawfafwaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"+originalKey);
-
                             byte[] decrypted = decryptFile(originalKey, image);
-                            System.out.println(decrypted);
 
                             if (isStoragePermissionGranted()) {
 
@@ -189,9 +181,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-
-
-
     }
 
     public static byte[] encryptFile(Key key, byte[] content) {
@@ -206,68 +195,6 @@ public class MainActivity extends AppCompatActivity {
         }
         return encrypted;
 
-    }
-
-    public byte[] encryptByteArray(byte[] byteArr){
-        byte[] tempArr = new byte[16];
-
-        byte[] newArr = byteArr.clone();
-
-        int id;
-
-        int transpoArr[] = {12,5,6,9,8,3,4,14,11,1,13,2,7,10,15,0};
-
-        int newTranspoArr[] = {15,9,11,5,6,1,2,12,4,3,13,8,0,10,7,14};
-
-        for(int i=2000; i<newArr.length; i++){
-
-            id = i%16;
-
-            tempArr[id] = newArr[i];
-
-            if(id == 15){
-                for(int j=0;j<16;j++){
-                    newArr[i+j-16] = tempArr[transpoArr[j]];
-                }
-            }
-        }
-        return newArr;
-    }
-
-    public String processBitMapString(String imgString){
-        String[] original = {"A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"};
-        String[] transpose = {"E","V","Z","X","Q","A","T","R","M","O","B","H","C","U","P","K","G","D","F","L","S","I","N","W","Y","J"};
-        String test = imgString.substring(0,6000);
-        boolean ind = false;
-
-        for(int i = 6000; i<imgString.length(); i++){
-            ind = false;
-            for(int j = 0; j<original.length; j++){
-                if(original[j].charAt(0) == imgString.charAt(i)){
-                    System.out.println(original[j]);
-                    test = test + transpose[j];
-                    ind = true;
-                    break;
-                }
-            }
-            if(!ind){
-                test = test + imgString.charAt(i);
-            }
-        }
-        System.out.println(imgString.substring(6000));
-        System.out.println(test.substring(6000));
-        System.out.println(test.length());
-        System.out.println(imgString.length());
-
-        return test;
-    }
-
-    public boolean isExternalStorageWritable() {
-        String state = Environment.getExternalStorageState();
-        if (Environment.MEDIA_MOUNTED.equals(state)) {
-            return true;
-        }
-        return false;
     }
 
     public boolean isStoragePermissionGranted() {
