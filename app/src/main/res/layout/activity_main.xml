@@ -18,18 +18,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <ImageView
-        android:id="@+id/img_view"
-        android:layout_width="250dp"
-        android:layout_height="173dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="28dp"
-        android:layout_marginEnd="8dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btn_gallery"
-        app:srcCompat="@color/colorAccent" />
-
     <Button
         android:id="@+id/btn_decrypt"
         android:layout_width="wrap_content"
@@ -41,10 +29,10 @@
         android:text="Decrypt"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintHorizontal_bias="0.514"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.982" />
+        app:layout_constraintTop_toBottomOf="@+id/txt_key"
+        app:layout_constraintVertical_bias="0.146" />
 
     <TextView
         android:id="@+id/txt_key"
@@ -52,19 +40,22 @@
         android:layout_height="43dp"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
-        android:layout_marginBottom="124dp"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.503"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        tools:layout_editor_absoluteY="152dp" />
 
     <TextView
         android:id="@+id/textView4"
         android:layout_width="70dp"
         android:layout_height="24dp"
+        android:layout_marginTop="44dp"
+        android:layout_marginBottom="8dp"
         android:text="Key"
         android:textAlignment="center"
         android:textSize="18sp"
-        tools:layout_editor_absoluteX="162dp"
-        tools:layout_editor_absoluteY="293dp" />
+        app:layout_constraintBottom_toTopOf="@+id/txt_key"
+        app:layout_constraintTop_toBottomOf="@+id/btn_gallery"
+        app:layout_constraintVertical_bias="0.0"
+        tools:layout_editor_absoluteX="157dp" />
 </android.support.constraint.ConstraintLayout>

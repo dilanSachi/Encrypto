@@ -20,6 +20,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.apache.commons.io.IOUtils;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -42,7 +44,6 @@ public class MainActivity extends AppCompatActivity {
 
     Button btn_gallery;
     Button btn_decrypt;
-    ImageView img_view;
     TextView txt_key;
 
     private static int RESULT_LOAD_IMG = 1;
@@ -53,7 +54,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         btn_gallery = (Button) findViewById(R.id.btn_gallery);
-        img_view = (ImageView) findViewById(R.id.img_view);
         btn_decrypt = (Button) findViewById(R.id.btn_decrypt);
         txt_key = (TextView) findViewById(R.id.txt_key);
 
@@ -110,21 +110,19 @@ public class MainActivity extends AppCompatActivity {
                                 System.out.println(key);
 
                                 byte[] k = key.getEncoded();
-                                String kk = Base64.encodeToString(k,1);
-
-                                txt_key.setText(kk);
+                                final String kk = Base64.encodeToString(k,1);
 
                                 byte[] encrypted = encryptFile(key, bytes);
 
-                                byte[] decrypted = decryptPdfFile(key, encrypted);
-                                System.out.println(decrypted);
+                                //byte[] decrypted = decryptFile(key, encrypted);
 
                                 if(isStoragePermissionGranted()){
 
                                     writeToSDFile(encrypted);
 
-                                    img_view.post(new Runnable() {
+                                    txt_key.post(new Runnable() {
                                         public void run() {
+                                            txt_key.setText(kk);
                                             //img_view.setImageBitmap(bit);
                                         }
                                     });
@@ -150,8 +148,11 @@ public class MainActivity extends AppCompatActivity {
             try{
                 final Uri imageUri = data.getData();
                 final InputStream imageStream = getContentResolver().openInputStream(imageUri);
-                final Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
-                final byte[] bytes = getBytesFromBitmap(selectedImage);
+
+                final byte[] image = IOUtils.toByteArray(imageStream);
+
+                //final Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
+                //final byte[] bytes = getBytesFromBitmap(selectedImage);
 
                 new Thread(new Runnable() {
                     public void run() {
@@ -160,14 +161,16 @@ public class MainActivity extends AppCompatActivity {
                             byte[] byt =  Base64.decode(txt_key.getText().toString(),1);
                             Key originalKey = new SecretKeySpec(byt, 0, byt.length, "AES");
 
-                            byte[] decrypted = decryptPdfFile(originalKey, bytes);
+                            System.out.println("awdawfawfafwaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"+originalKey);
+
+                            byte[] decrypted = decryptFile(originalKey, image);
                             System.out.println(decrypted);
 
                             if (isStoragePermissionGranted()) {
 
                                 writeToSDFile(decrypted);
 
-                                img_view.post(new Runnable() {
+                                txt_key.post(new Runnable() {
                                     public void run() {
                                         //img_view.setImageBitmap(bit);
                                     }
@@ -181,6 +184,7 @@ public class MainActivity extends AppCompatActivity {
                 }).start();
 
             }catch(Exception e){
+                e.printStackTrace();
                 Toast.makeText(MainActivity.this,"Error",Toast.LENGTH_SHORT).show();
             }
         }
@@ -250,27 +254,12 @@ public class MainActivity extends AppCompatActivity {
                 test = test + imgString.charAt(i);
             }
         }
-        //System.out.println(imgString);
-        //System.out.println(imgString.length());
-        //Toast.makeText(MainActivity.this, imgString.length(), Toast.LENGTH_LONG).show();
-        //System.out.println(test);
-
         System.out.println(imgString.substring(6000));
         System.out.println(test.substring(6000));
         System.out.println(test.length());
         System.out.println(imgString.length());
 
         return test;
-
-/*
-        try{
-            byte [] encodeByte=Base64.decode(test,Base64.DEFAULT);
-            Bitmap bitmap=BitmapFactory.decodeByteArray(encodeByte, 0, encodeByte.length);
-            return bitmap;
-        }catch(Exception e){
-            e.getMessage();
-            return null;
-        }*/
     }
 
     public boolean isExternalStorageWritable() {
@@ -279,26 +268,6 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
         return false;
-    }
-
-    /* Checks if external storage is available to at least read */
-    public boolean isExternalStorageReadable() {
-        String state = Environment.getExternalStorageState();
-        if (Environment.MEDIA_MOUNTED.equals(state) ||
-                Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
-            return true;
-        }
-        return false;
-    }
-
-    public File getPublicAlbumStorageDir(String albumName) {
-        // Get the directory for the user's public pictures directory.
-        File file = new File(Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_PICTURES), albumName);
-        if (!file.mkdirs()) {
-            System.out.println( "Directory not created");
-        }
-        return file;
     }
 
     public boolean isStoragePermissionGranted() {
@@ -320,7 +289,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public static byte[] decryptPdfFile(Key key, byte[] textCryp) {
+    public static byte[] decryptFile(Key key, byte[] textCryp) {
         Cipher cipher;
         byte[] decrypted = null;
         try {
@@ -336,33 +305,18 @@ public class MainActivity extends AppCompatActivity {
 
     private void writeToSDFile(byte[] inputStream){
 
-        // Find the root of the external storage.
-        // See http://developer.android.com/guide/topics/data/data-  storage.html#filesExternal
-
         File root = android.os.Environment.getExternalStorageDirectory();
-        //tv.append("\nExternal file system root: "+root);
-
-        // See http://stackoverflow.com/questions/3551821/android-write-to-sd-card-folder
-
         File dir = new File (root.getAbsolutePath() + "/download");
         dir.mkdirs();
-        File file = new File(dir, "myDa.jpg");
+        File file = new File(dir, "myData.jpg");
 
         try {
             FileOutputStream outputStream = new FileOutputStream(file);
-            //System.out.println(inputStream.length);
 
             for(int i = 0; i < inputStream.length; i ++){
-                //System.out.println(inputStream[i]);
+                System.out.println(inputStream[i]);
                 outputStream.write(inputStream[i]);
             }
-/*
-            int i;
-            while((i=inputStream.read())!=-1){
-                outputStream.write(i);
-                System.out.println("asfasf");
-            }
-*/
             outputStream.flush();
             outputStream.close();
         } catch (FileNotFoundException e) {
